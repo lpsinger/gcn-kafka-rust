@@ -5,6 +5,7 @@ use rdkafka::{
     consumer::{Consumer, StreamConsumer},
 };
 use std::env::var;
+use std::time::Duration;
 
 #[tokio::main]
 pub async fn main() {
@@ -16,6 +17,16 @@ pub async fn main() {
     );
 
     let consumer: StreamConsumer = config.create().unwrap();
+
+    println!("Topics:");
+    for topic in consumer
+        .fetch_metadata(None, Duration::from_secs(1))
+        .unwrap()
+        .topics()
+    {
+        println!("{}", topic.name());
+    }
+
     consumer.subscribe(&["gcn.heartbeat"]).unwrap();
 
     loop {
